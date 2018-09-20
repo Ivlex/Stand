@@ -348,7 +348,7 @@ socket.onmessage = function(event)  //реакция на получение н�
         findElem.value = "close";
 
         out = '<div class="card">' +
-              '<div class="card-content"> <img id = card3Img src="gif/k0.png" width="15%"/></div>' +
+              '<div class="card-content"> <img id = card3Img src="gif/k0.png" width="50%"/></div>' +
             '</div>'
         document.getElementById('pgcontent').innerHTML += out;
 
