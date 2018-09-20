@@ -63,7 +63,13 @@ var b = '';
 
 var onBtn = false;
 
-var allTimeValue = 0;
+var blaEui = '';
+
+var allTimeValue1 = 0;
+
+var allTimeValue2 = 0;
+
+var allTimeValue3 = 0;
 
 var lastBatary = 0;
 
@@ -110,6 +116,13 @@ socket.onmessage = function(event)  //реакция на получение н�
   //если это автоматически пришедшие данные
   if(response.cmd == "rx")
   {
+  	//если это счетчик импульсов
+  	if(response.devEui == '353035304F376912')
+  	{
+  		allTimeValue1 = allTimeValue1 +  Number(littleEndianToDec(response.data_list[i].data.substring(16,24)));//Number(littleEndianToDec(response.data_list.data.substring(24,32))) + Number(littleEndianToDec(response.data_list.data.substring(32,40)));
+  		allTimeValue2 = allTimeValue2 +  Number(littleEndianToDec(response.data_list[i].data.substring(24,32)));
+  		allTimeValue3 = allTimeValue3 +  Number(littleEndianToDec(response.data_list[i].data.substring(32,40)));
+  	}
     //если это наш счетчик воды
     if(response.devEui == "303632316E377215")
     {
@@ -121,12 +134,7 @@ socket.onmessage = function(event)  //реакция на получение н�
       lastBatary = littleEndianToDec(response.data_list.data.substring(2,4));
       lastTemp = littleEndianToDec(response.data_list.data.substring(14,16));
 
-      allTimeValue = allTimeValue +  Number(littleEndianToDec(response.data_list.data.substring(16,24)));//Number(littleEndianToDec(response.data_list.data.substring(24,32))) + Number(littleEndianToDec(response.data_list.data.substring(32,40)));
-
-      /*var find = document.getElementById("info12");
-      find.value = "Заряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
-      + " \nПоследние показания получены: " + new Date(lastDate);*/
-      var find = "Заряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
+      var find = "Текущие показания: " + allTimeValue + " \nЗаряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
       + " \nПоследние показания получены: " + new Date(lastDate);
       document.getElementById('card1').innerHTML = find;
     }
@@ -145,8 +153,19 @@ socket.onmessage = function(event)  //реакция на получение н�
 
     if(onBtn)
     {
+    	//если это СИ-11 с импульсами, прибавляем импульсы
+    	if(response.devEui == '353035304F376912')
+    	{
+    		//alert('NEWWWWWWWWW WAAAAA');
+    		var str = '';
+    		allTimeValue1 = allTimeValue1 +  Number(littleEndianToDec(response.data_list[i].data.substring(16,24)));//Number(littleEndianToDec(response.data_list.data.substring(24,32))) + Number(littleEndianToDec(response.data_list.data.substring(32,40)));
+  			allTimeValue2 = allTimeValue2 +  Number(littleEndianToDec(response.data_list[i].data.substring(24,32)));
+  			allTimeValue3 = allTimeValue3 +  Number(littleEndianToDec(response.data_list[i].data.substring(32,40)));
+  			str = str + allTimeValue1 + ' ' + allTimeValue2 + ' ' + allTimeValue3;
+    		document.getElementById('card1').innerHTML = str;
+    	}
       //если это СИ-12, дальше идет разбор всех типов пакетов, кроме архивных
-      if(devicesList[response.devEui].type == "СИ-12")
+      else if(response.devEui == '303632316E377215')
       {
         while(response.data_list[i])
         {
@@ -250,7 +269,6 @@ socket.onmessage = function(event)  //реакция на получение н�
           alert("Получены данные get_data_resp:\n" + dataStr);
           dataStr = '';
         }
-
       }
 
       //если это не СИ-12
@@ -261,13 +279,14 @@ socket.onmessage = function(event)  //реакция на получение н�
             dataStr = dataStr + response.data_list[i].data +'\n'; 
             i++;
           }
-          alert("Получены данные get_data_resp:\n" + dataStr);
+          //alert("Получены данные get_data_resp:\n" + dataStr);
       }
     }
     else
     {
+     if(response.devEui == '303632316E377215')
+     {
       var i = 0;
-
       if(response.data_list[i])
       {
         date = parseInt((response.data_list[i].data.substring(12,14)
@@ -279,16 +298,16 @@ socket.onmessage = function(event)  //реакция на получение н�
         lastTemp = littleEndianToDec(response.data_list[i].data.substring(14,16));
       }
 
-      while(response.data_list[i])
+      /*while(response.data_list[i])
       {
         if(response.data_list[i].data.substring(0,2) == "01")
         {
           //allTimeValue = allTimeValue + Number(littleEndianToDec(response.data_list[i].data.substring(16,24)));//Number(littleEndianToDec(response.data_list[i].data.substring(24,32))) + Number(littleEndianToDec(response.data_list[i].data.substring(32,40)));
         }
         i++;
-      }
+      }*/
       
-      var out = "Заряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
+      var out = "Текущие показания: " + allTimeValue1 + ' ' + allTimeValue2 + ' ' + allTimeValue3 + " \nЗаряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
       + " \nПоследние показания получены: " + new Date(lastDate);
 
       out = '<div class="card">' +
@@ -297,6 +316,33 @@ socket.onmessage = function(event)  //реакция на получение н�
       document.getElementById('pgcontent').innerHTML += out;
 
       onBtn = true;
+     }
+     else if(response.devEui == '353035304F376912')
+     {
+    	var i = 0;
+     	var str = '';
+    	while(response.data_list[i])
+      	{
+        	if(response.data_list[i].data.substring(0,2) == "01")
+        	{
+          		allTimeValue1 = allTimeValue1 +  Number(littleEndianToDec(response.data_list[i].data.substring(16,24)));//Number(littleEndianToDec(response.data_list.data.substring(24,32))) + Number(littleEndianToDec(response.data_list.data.substring(32,40)));
+  				allTimeValue2 = allTimeValue2 +  Number(littleEndianToDec(response.data_list[i].data.substring(24,32)));
+  				allTimeValue3 = allTimeValue3 +  Number(littleEndianToDec(response.data_list[i].data.substring(32,40)));
+  				//str = allTimeValue1 + ' ' + allTimeValue2 + ' ' + allTimeValue3;
+  				//alert(str);
+        	}
+        i++;
+	    }
+        /*var out = "Текущие показания: " + allTimeValue + " \nЗаряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
+      	+ " \nПоследние показания получены: " + new Date(lastDate);
+
+      	out = '<div class="card">' +
+              '<div class="card-content card-content-padding id = card1">' + out + '</div>' +
+            '</div>'
+      	document.getElementById('pgcontent').innerHTML += out;*/
+
+      //onBtn = true;
+     }
     }
   }
 
@@ -310,7 +356,8 @@ socket.onmessage = function(event)  //реакция на получение н�
     while(response.devices_list[i])
     {
       var type = "unknown";
-      if(response.devices_list[i].devName.indexOf("СИ-12") !== -1)
+
+      if(response.devices_list[i].devName.indexOf("СИ-12") !== -1 && response.devices_list[i].devEui == '303632316E377215')
       {
         type = "СИ-12";
         var countChannels = "unknown";
@@ -322,6 +369,7 @@ socket.onmessage = function(event)  //реакция на получение н�
         var otherInfo = "";
         var dev = new Device(response.devices_list[i].devName,type, response.devices_list[i].devEui, countChannels, transPeriod, lat, lon, lastDataTs, lastDataCharge, otherInfo);
 
+        
         var out = response.devices_list[i].devEui + "g";
         out = '<div class="block">' +
                 '<div class="row">' +
@@ -329,10 +377,11 @@ socket.onmessage = function(event)  //реакция на получение н�
                 '</div>' +
               '</div>'
         document.getElementById('pgcontent').innerHTML += out;
+        a = response.devices_list[i].devEui + "g";
 
         var findElem = document.getElementById(response.devices_list[i].devEui + "g");
         findElem.setAttribute("onclick","clickOnBtn_getData(this.id.slice(0,-1))");
-        a = response.devices_list[i].devEui + "g";
+
 
         out = '<div class="card">' +
               '<div class="card-content card-content-padding id = card2">Кнопка, открывающая/закрывающая клапан</div>' +
@@ -345,8 +394,8 @@ socket.onmessage = function(event)  //реакция на получение н�
                   '<button class="col button button-fill" style="width:360px" id = "' + out + '">Открыть клапан</button>' +
                 '</div>' +
               '</div>'
-        b = response.devices_list[i].devEui + "s";
         document.getElementById('pgcontent').innerHTML += out;
+        b = response.devices_list[i].devEui + "s"
 
         findElem = document.getElementById(response.devices_list[i].devEui + "s");
         findElem.setAttribute("onclick","clickOnBtn_sendData(this.id.slice(0,-1))");
@@ -359,9 +408,24 @@ socket.onmessage = function(event)  //реакция на получение н�
 
         devicesList[response.devices_list[i].devEui] = dev;
 
-        eui = response.devices_list[i].devEui;
 
-        break;
+        eui = response.devices_list[i].devEui;
+        
+        //break;
+      }
+      if(response.devices_list[i].devName.indexOf("СИ-11") !== -1 && response.devices_list[i].devEui == '353035304F376912')
+      {
+      	type = "СИ-11";
+        var countChannels = "unknown";
+        var transPeriod = "unknown";
+        var lat = "unknown";
+        var lon = "unknown";
+        var lastDataTs = "" + response.devices_list[i].last_data_ts;
+        var lastDataCharge = "unknown";
+        var otherInfo = "";
+        var dev = new Device(response.devices_list[i].devName,type, response.devices_list[i].devEui, countChannels, transPeriod, lat, lon, lastDataTs, lastDataCharge, otherInfo);
+
+        blaEui = response.devices_list[i].devEui;
       }
       i++;
     }
@@ -373,9 +437,19 @@ socket.onmessage = function(event)  //реакция на получение н�
     //запрос всех существующих данных
     var getDataCmd = {
     cmd: "get_data_req",
-    devEui: eui,
+    devEui: blaEui,
     select: {
         date_from: 0
+      }
+    };
+    msg = JSON.stringify(getDataCmd);
+    socket.send(msg);
+
+    var getDataCmd = {
+    cmd: "get_data_req",
+    devEui: eui,
+    select: {
+        limit: 1
       }
     };
     msg = JSON.stringify(getDataCmd);
@@ -391,7 +465,6 @@ socket.onclose = function(event)  //обработка закрытия Websocke
     alert('Обрыв соединения'); // например, "убит" процесс сервера
   }
   alert('Код: ' + event.code + ' причина: ' + event.reason);
-
   //блокировка кнопок
   var findElem = document.getElementById(a);
   findElem.disabled = true;
