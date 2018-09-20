@@ -1,4 +1,4 @@
-var app = new Framework7({
+﻿var app = new Framework7({
   // App root element
   root: '#app',
   // App Name
@@ -88,6 +88,15 @@ socket.onopen = function()  //реакция на открытие WebSocket
 
   msg = JSON.stringify(comand);
   socket.send(msg);
+
+    if(onBtn)
+  {
+    var findElem = document.getElementById('555');
+    findElem.disabled = false;
+
+    var findElem = document.getElementById('777');
+    findElem.disabled = false;
+  }
 };
 
 socket.onmessage = function(event)  //реакция на получение нового сообщения в WebSocket
@@ -108,11 +117,14 @@ socket.onmessage = function(event)  //реакция на получение н�
       lastBatary = littleEndianToDec(response.data_list.data.substring(2,4));
       lastTemp = littleEndianToDec(response.data_list.data.substring(14,16));
 
-      //allTimeValue = allTimeValue +  Number(littleEndianToDec(response.data_list.data.substring(16,24)));//Number(littleEndianToDec(response.data_list.data.substring(24,32))) + Number(littleEndianToDec(response.data_list.data.substring(32,40)));
+      allTimeValue = allTimeValue +  Number(littleEndianToDec(response.data_list.data.substring(16,24)));//Number(littleEndianToDec(response.data_list.data.substring(24,32))) + Number(littleEndianToDec(response.data_list.data.substring(32,40)));
 
-      var find = document.getElementById("info12");
-      find.value = "Текущие показания: " + allTimeValue + " \nЗаряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
+      /*var find = document.getElementById("info12");
+      find.value = "Заряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
+      + " \nПоследние показания получены: " + new Date(lastDate);*/
+      var find = "Заряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
       + " \nПоследние показания получены: " + new Date(lastDate);
+      document.getElementById('card1').innerHTML = find;
     }
     /*alert("Получены данные rx:\nВремя: " + response.ts + "\ndevEui: "             //вывод данных в реальном времени, ЗАКОММЕНЧЕН!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      + response.devEui + "\nДанные: " + response.data);*/
@@ -272,7 +284,7 @@ socket.onmessage = function(event)  //реакция на получение н�
         i++;
       }
       
-      var out = "Текущие показания: " + allTimeValue + " \nЗаряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
+      var out = "Заряд батареи: " + lastBatary + " \nТемпература: " + lastTemp
       + " \nПоследние показания получены: " + new Date(lastDate);
 
       out = '<div class="card">' +
@@ -336,7 +348,7 @@ socket.onmessage = function(event)  //реакция на получение н�
         findElem.value = "close";
 
         out = '<div class="card">' +
-              '<div class="card-content"> <img id = card3Img src="gif/k0.png" width="50%"/></div>' +
+              '<div class="card-content"> <img id = card3Img src="gif/k0.png" width="15%"/></div>' +
             '</div>'
         document.getElementById('pgcontent').innerHTML += out;
 
@@ -349,10 +361,11 @@ socket.onmessage = function(event)  //реакция на получение н�
       i++;
     }
 
-    var textElem = document.createElement("p");
+    /*var textElem = document.createElement("p");
     textElem.innerHTML = "Информация об устройстве";
-    document.body.appendChild(textElem);
+    document.body.appendChild(textElem);*/
 
+    //запрос всех существующих данных
     var getDataCmd = {
     cmd: "get_data_req",
     devEui: eui,
@@ -373,6 +386,13 @@ socket.onclose = function(event)  //обработка закрытия Websocke
     alert('Обрыв соединения'); // например, "убит" процесс сервера
   }
   alert('Код: ' + event.code + ' причина: ' + event.reason);
+
+  //блокировка кнопок
+  var findElem = document.getElementById('555');
+  findElem.disabled = true;
+
+  var findElem = document.getElementById('777');
+  findElem.disabled = true;
 };
 
 socket.onerror = function(error)
@@ -409,7 +429,6 @@ function clickOnBtn_sendData(pDevEui)  //отправка команды на у
     findImg.src = "gif/k1.gif";
     findElem.value = "open";
     condition = 1;
-    counter();
   }
   else
   {
@@ -432,7 +451,7 @@ function clickOnBtn_sendData(pDevEui)  //отправка команды на у
   };
   msg = JSON.stringify(sendDataCmd);
 
-  //socket.send(msg);                     //ОТСЫЛКА ДАННЫХ ЗАКОММЕНЧЕНА!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  socket.send(msg);                     //ОТСЫЛКА ДАННЫХ ЗАКОММЕНЧЕНА!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 function stringToLittleEndian(str)  //перевод строки в littleEndian
@@ -493,16 +512,4 @@ function littleEndianToDec(hex)
     str = Number(tmp) + str;
   }
   return ""+str;
-}
-
-function counter()
-{
-  if(condition)
-  {
-    for(i = 1; i < 100000; i++)
-    {
-
-    }
-    allTimeValue++;
-  }
 }
