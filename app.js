@@ -57,6 +57,10 @@ class Device
   }
 }
 
+var a = '';
+
+var b = '';
+
 var onBtn = false;
 
 var allTimeValue = 0;
@@ -89,12 +93,12 @@ socket.onopen = function()  //реакция на открытие WebSocket
   msg = JSON.stringify(comand);
   socket.send(msg);
 
-    if(onBtn)
+  if(onBtn)
   {
-    var findElem = document.getElementById('555');
+    var findElem = document.getElementById(a);
     findElem.disabled = false;
 
-    var findElem = document.getElementById('777');
+    var findElem = document.getElementById(b);
     findElem.disabled = false;
   }
 };
@@ -321,14 +325,14 @@ socket.onmessage = function(event)  //реакция на получение н�
         var out = response.devices_list[i].devEui + "g";
         out = '<div class="block">' +
                 '<div class="row">' +
-                  '<button class="col button button-fill" style="width:360px" id = 555"' + out + '">Запросить 5 последних пакетов</button>' +
+                  '<button class="col button button-fill" style="width:360px" id = "' + out + '">Запросить 5 последних пакетов</button>' +
                 '</div>' +
               '</div>'
         document.getElementById('pgcontent').innerHTML += out;
 
         var findElem = document.getElementById(response.devices_list[i].devEui + "g");
         findElem.setAttribute("onclick","clickOnBtn_getData(this.id.slice(0,-1))");
-
+        a = response.devices_list[i].devEui + "g";
 
         out = '<div class="card">' +
               '<div class="card-content card-content-padding id = card2">Кнопка, открывающая/закрывающая клапан</div>' +
@@ -338,9 +342,10 @@ socket.onmessage = function(event)  //реакция на получение н�
         out = response.devices_list[i].devEui + "s";
         out = '<div class="block">' +
                 '<div class="row">' +
-                  '<button class="col button button-fill" style="width:360px" id = 777"' + out + '">Открыть клапан</button>' +
+                  '<button class="col button button-fill" style="width:360px" id = "' + out + '">Открыть клапан</button>' +
                 '</div>' +
               '</div>'
+        b = response.devices_list[i].devEui + "s";
         document.getElementById('pgcontent').innerHTML += out;
 
         findElem = document.getElementById(response.devices_list[i].devEui + "s");
@@ -388,10 +393,10 @@ socket.onclose = function(event)  //обработка закрытия Websocke
   alert('Код: ' + event.code + ' причина: ' + event.reason);
 
   //блокировка кнопок
-  var findElem = document.getElementById('555');
+  var findElem = document.getElementById(a);
   findElem.disabled = true;
 
-  var findElem = document.getElementById('777');
+  var findElem = document.getElementById(b);
   findElem.disabled = true;
 };
 
