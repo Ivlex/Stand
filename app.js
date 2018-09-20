@@ -321,7 +321,7 @@ socket.onmessage = function(event)  //реакция на получение н�
         var out = response.devices_list[i].devEui + "g";
         out = '<div class="block">' +
                 '<div class="row">' +
-                  '<button class="col button button-fill" style="width:360px" id = "' + out + '">Запросить 5 последних пакетов</button>' +
+                  '<button class="col button button-fill" style="width:360px" id = 555"' + out + '">Запросить 5 последних пакетов</button>' +
                 '</div>' +
               '</div>'
         document.getElementById('pgcontent').innerHTML += out;
@@ -338,7 +338,7 @@ socket.onmessage = function(event)  //реакция на получение н�
         out = response.devices_list[i].devEui + "s";
         out = '<div class="block">' +
                 '<div class="row">' +
-                  '<button class="col button button-fill" style="width:360px" id = "' + out + '">Открыть клапан</button>' +
+                  '<button class="col button button-fill" style="width:360px" id = 777"' + out + '">Открыть клапан</button>' +
                 '</div>' +
               '</div>'
         document.getElementById('pgcontent').innerHTML += out;
