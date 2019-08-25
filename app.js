@@ -191,7 +191,6 @@ function clickOnBtn_sendData(pDevEui)  //отправка команды на у
   var sendData;
   
   var findElem = document.getElementById(pDevEui+"s");
-  alert(findElem.value);
   var findImg = document.getElementById("card3Img");
   if(findElem.value == "close")
   {
@@ -221,7 +220,5 @@ function clickOnBtn_sendData(pDevEui)  //отправка команды на у
     }]
   };
   msg = JSON.stringify(sendDataCmd);
-  alert("Ушло");
-  alert("Сообщение " + msg.cmd);
   socket.send(msg);
 }
